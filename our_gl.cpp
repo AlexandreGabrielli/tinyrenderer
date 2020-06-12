@@ -3,6 +3,14 @@
 #include <cstdlib>
 #include "our_gl.h"
 
+#include <xmmintrin.h>
+#include <xmmintrin.h> // SSE
+#include <emmintrin.h> // SSE2
+#include <pmmintrin.h> // SSE3
+#include <tmmintrin.h> // SSSE3
+#include <smmintrin.h> // SSE4.1
+#include <nmmintrin.h> // SSE4.2
+
 Matrix ModelView;
 Matrix Viewport;
 Matrix Projection;
@@ -40,17 +48,74 @@ void lookat(Vec3f eye, Vec3f center, Vec3f up) {
 }
 
 Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
-    Vec3f s[2];
-    for (int i=2; i--; ) {
-        s[i][0] = C[i]-A[i];
-        s[i][1] = B[i]-A[i];
-        s[i][2] = A[i]-P[i];
+/**
+//        u[0] = (B[0] - A[0]) * ______ - ______ * ________;
+//        u[1] = (A[0] - P[0]) * ______ - ______ * ________;
+//        u[2] = (C[0] - A[0]) * ______ - ______ * ________;
+    __m128 s1 = _mm_set_ps(B[0],A[0] , C[0],0);
+    __m128 s2 = _mm_set_ps(A[0],P[0] , A[0],0);
+   s1 = _mm_sub_ps(s1 ,s2);
+    
+//        u[0] = ______ * (A[1] - P[1]) - ______ * ________;
+//        u[1] = ______ * (C[1] - A[1]) - ______ * ________;
+//        u[2] = ______ * (B[1] - A[1]) - ______ * ________;
+    __m128 s3 = _mm_set_ps(A[1],C[1] , B[1],0);
+    __m128 s4 = _mm_set_ps(P[1],A[1] , A[1],0);
+    s3= _mm_sub_ps(s3 ,s4);
+
+//        u[0] = ______ * ______ - (A[0] - P[0]) * ______;
+//        u[1] = ______ * ______ - (C[0] - A[0]) * ______;
+//        u[2] = ______ * ______ - (B[0] - A[0]) * ______;
+
+    __m128 s5 = _mm_set_ps(A[0],C[0] , B[0],0);
+    __m128 s6 = _mm_set_ps(P[0],A[0] , A[0],0);
+    s5 = _mm_sub_ps(s5 ,s6);
+
+//        u[0] = ______ * ______ - ______ * (B[1] - A[1]);
+//        u[1] = ______ * ______ - ______ * (A[1] - P[1]);
+//        u[2] = ______ * ______ - ______ * (C[1] - A[1]);
+    __m128 s7 = _mm_set_ps(B[1],A[1] , C[1],0);
+    __m128 s8 = _mm_set_ps(A[1],P[1] , A[1],0);
+    s7 = _mm_sub_ps(s7 ,s8);
+    
+//        u[0] = s1 * s3 - ______ * ______;
+//        u[1] = s1 * s3 - ______ * ______;
+//        u[2] = s1 * s3 - ______ * ______;
+    s1 = _mm_mul_ps(s1,s3);
+
+//        u[0] = ______ * ______ - s5 * s7;
+//        u[1] = ______ * ______ - s5 * s7;
+//        u[2] = ______ * ______ - s5 * s7;
+    s5 = _mm_mul_ps(s5,s7);
+
+//        u[0] = s1 - s5;
+//        u[1] = s1 - s5;
+//        u[2] = s1 - s5;
+    s1 = _mm_sub_ps(s1 ,s5);
+
+    float u[4];
+    
+    _mm_store_ps(u , s1);
+    if (std::abs(u[2]) <= 1e-2) {
+        return Vec3f(-1, 1, 1);
+        } else {
+        return Vec3f (1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
     }
-    Vec3f u = cross(s[0], s[1]);
-    if (std::abs(u[2])>1e-2) // dont forget that u[2] is integer. If it is zero then triangle ABC is degenerate
-        return Vec3f(1.f-(u.x+u.y)/u.z, u.y/u.z, u.x/u.z);
-    return Vec3f(-1,1,1); // in this case generate negative coordinates, it will be thrown away by the rasterizator
+*/	
+
+        float u[4];
+        u[0] = (B[0] - A[0]) * (A[1] - P[1]) - (A[0] - P[0]) * (B[1] - A[1]);
+        u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
+        u[2] = (C[0] - A[0]) * (B[1] - A[1]) - (B[0] - A[0]) * (C[1] - A[1]);
+    if (std::abs(u[2]) <= 1e-2) {
+        return Vec3f(-1, 1, 1);
+    } else {
+       return Vec3f (1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
+     }
+
+
 }
+
 
 void triangle(mat<4,3,float> &clipc, IShader &shader, TGAImage &image, float *zbuffer) {
     mat<3,4,float> pts  = (Viewport*clipc).transpose(); // transposed to ease access to each of the points

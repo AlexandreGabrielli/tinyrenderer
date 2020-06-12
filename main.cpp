@@ -1,6 +1,7 @@
 #include <vector>
 #include <limits>
 #include <iostream>
+#include <algorithm>
 #include "tgaimage.h"
 #include "model.h"
 #include "geometry.h"
@@ -66,7 +67,8 @@ int main(int argc, char** argv) {
     }
 
     float *zbuffer = new float[width*height];
-    for (int i=width*height; i--; zbuffer[i] = -std::numeric_limits<float>::max());
+   
+    std::fill_n(zbuffer,width*height, -std::numeric_limits<float>::max());
 
     TGAImage frame(width, height, TGAImage::RGB);
     lookat(eye, center, up);
