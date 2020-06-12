@@ -46,9 +46,8 @@ void lookat(Vec3f eye, Vec3f center, Vec3f up) {
     }
     ModelView = Minv*Tr;
 }
+Vec3f barycentric_2(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
 
-Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
-/**
 //        u[0] = (B[0] - A[0]) * ______ - ______ * ________;
 //        u[1] = (A[0] - P[0]) * ______ - ______ * ________;
 //        u[2] = (C[0] - A[0]) * ______ - ______ * ________;
@@ -101,8 +100,10 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
         } else {
         return Vec3f (1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
     }
-*/	
+	
+}
 
+Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
         float u[4];
         u[0] = (B[0] - A[0]) * (A[1] - P[1]) - (A[0] - P[0]) * (B[1] - A[1]);
         u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
@@ -135,7 +136,7 @@ void triangle(mat<4,3,float> &clipc, IShader &shader, TGAImage &image, float *zb
     TGAColor color;
     for (P.x=bboxmin.x; P.x<=bboxmax.x; P.x++) {
         for (P.y=bboxmin.y; P.y<=bboxmax.y; P.y++) {
-            Vec3f bc_screen  = barycentric(pts2[0], pts2[1], pts2[2], P);
+            Vec3f bc_screen  = barycentric_2(pts2[0], pts2[1], pts2[2], P);
             Vec3f bc_clip    = Vec3f(bc_screen.x/pts[0][3], bc_screen.y/pts[1][3], bc_screen.z/pts[2][3]);
             bc_clip = bc_clip/(bc_clip.x+bc_clip.y+bc_clip.z);
             float frag_depth = clipc[2]*bc_clip;
