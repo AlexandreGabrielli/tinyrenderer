@@ -25,7 +25,7 @@ struct TGAColor {
     unsigned char bytespp;
 
     TGAColor() : bgra(), bytespp(1) {
-        for (int i=0; i<4; i++) bgra[i] = 0;
+        for (unsigned char & i : bgra) i = 0;
     }
 
     TGAColor(unsigned char R, unsigned char G, unsigned char B, unsigned char A=255) : bgra(), bytespp(4) {
@@ -35,8 +35,8 @@ struct TGAColor {
         bgra[3] = A;
     }
 
-    TGAColor(unsigned char v) : bgra(), bytespp(1) {
-        for (int i=0; i<4; i++) bgra[i] = 0;
+    explicit TGAColor(unsigned char v) : bgra(), bytespp(1) {
+        for (unsigned char & i : bgra) i = 0;
         bgra[0] = v;
     }
 
