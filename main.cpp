@@ -7,7 +7,7 @@
 #include "geometry.h"
 #include "our_gl.h"
 
-Model *model        = NULL;
+Model *model        = nullptr;
 
 const int width  = 800;
 const int height = 800;
@@ -23,7 +23,7 @@ struct Shader : public IShader {
     mat<3,3,float> varying_nrm; // normal per vertex to be interpolated by FS
     mat<3,3,float> ndc_tri;     // triangle in normalized device coordinates
 
-    virtual Vec4f vertex(int iface, int nthvert) {
+    Vec4f vertex(int iface, int nthvert) override {
         varying_uv.set_col(nthvert, model->uv(iface, nthvert));
         varying_nrm.set_col(nthvert, proj<3>((Projection*ModelView).invert_transpose()*embed<4>(model->normal(iface, nthvert), 0.f)));
         Vec4f gl_Vertex = Projection*ModelView*embed<4>(model->vert(iface, nthvert));
@@ -32,7 +32,7 @@ struct Shader : public IShader {
         return gl_Vertex;
     }
 
-    virtual bool fragment(Vec3f bar, TGAColor &color) {
+    bool fragment(Vec3f bar, TGAColor &color) override {
         Vec3f bn = (varying_nrm*bar).normalize();
         Vec2f uv = varying_uv*bar;
 
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    float *zbuffer = new float[width*height];
+    auto *zbuffer = new float[width*height];
    
     std::fill_n(zbuffer,width*height, -std::numeric_limits<float>::max());
 

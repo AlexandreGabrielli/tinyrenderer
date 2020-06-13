@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <utility>
 #include "model.h"
 
 Model::Model(const char *filename) : verts_(), faces_(), norms_(), uv_(), diffusemap_(), normalmap_(), specularmap_() {
@@ -10,7 +11,7 @@ Model::Model(const char *filename) : verts_(), faces_(), norms_(), uv_(), diffus
     std::string line;
     while (!in.eof()) {
         std::getline(in, line);
-        std::istringstream iss(line.c_str());
+        std::istringstream iss(line);
         char trash;
         if (!line.compare(0, 2, "v ")) {
             iss >> trash;
@@ -44,7 +45,7 @@ Model::Model(const char *filename) : verts_(), faces_(), norms_(), uv_(), diffus
     load_texture(filename, "_spec.tga",    specularmap_);
 }
 
-Model::~Model() {}
+Model::~Model() = default;
 
 int Model::nverts() {
     return (int)verts_.size();
@@ -56,7 +57,7 @@ int Model::nfaces() {
 
 std::vector<int> Model::face(int idx) {
     std::vector<int> face;
-    for (int i=0; i<(int)faces_[idx].size(); i++) face.push_back(faces_[idx][i][0]);
+    for (auto & i : faces_[idx]) face.push_back(i[0]);
     return face;
 }
 
@@ -69,8 +70,8 @@ Vec3f Model::vert(int iface, int nthvert) {
 }
 
 void Model::load_texture(std::string filename, const char *suffix, TGAImage &img) {
-    std::string texfile(filename);
-    size_t dot = texfile.find_last_of(".");
+    std::string texfile(std::move(filename));
+    size_t dot = texfile.find_last_of('.');
     if (dot!=std::string::npos) {
         texfile = texfile.substr(0,dot) + std::string(suffix);
         std::cerr << "texture file " << texfile << " loading " << (img.read_tga_file(texfile.c_str()) ? "ok" : "failed") << std::endl;

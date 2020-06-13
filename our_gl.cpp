@@ -3,6 +3,13 @@
 #include <cstdlib>
 #include "our_gl.h"
 
+#include <xmmintrin.h>
+#include <xmmintrin.h> // SSE
+#include <emmintrin.h> // SSE2
+#include <pmmintrin.h> // SSE3
+#include <tmmintrin.h> // SSSE3
+#include <smmintrin.h> // SSE4.1
+#include <nmmintrin.h> // SSE4.2
 
 Matrix ModelView;
 Matrix Viewport;
@@ -42,17 +49,16 @@ void lookat(Vec3f eye, Vec3f center, Vec3f up) {
 
 Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
     float u[3];
+
     u[2] = (C[0] - A[0]) * (B[1] - A[1]) - (B[0] - A[0]) * (C[1] - A[1]);
     if (std::abs(u[2]) <= 1e-2) {
         return Vec3f(-1, 1, 1);
     } else {
         u[0] = (B[0] - A[0]) * (A[1] - P[1]) - (A[0] - P[0]) * (B[1] - A[1]);
-    	u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
+        u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
         return Vec3f(1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
     }
 }
-
-
 
 void triangle(mat<4, 3, float> &clipc, IShader &shader, TGAImage &image, float *zbuffer) {
     mat<3, 4, float> pts = (Viewport * clipc).transpose(); // transposed to ease access to each of the points

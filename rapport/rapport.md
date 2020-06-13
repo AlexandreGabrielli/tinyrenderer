@@ -186,7 +186,7 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
 }
 ```
 
-### amélioration de performance :
+### gain de performance barycentrique SIMD:
 
  Performance counter stats for './main ./obj/diablo3_pose/diablo3_pose.obj':
 
@@ -202,4 +202,4 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
     
        2.619942000 seconds user
        0.023962000 seconds sys
-on voit ici que ce n'est pas une bonne idée d'utilisé des SIMD , le fait de ne pas faire tout les calculs est beaucoup plus rentable, cela nous enlève des caches-misses très gourmante en terme de temps d'excecution.
+on voit ici que ce n'est pas une bonne idée d'utilisé des SIMD , le fait de ne pas faire tout les calculs est beaucoup plus rentable, cela nous enlève des caches-misses très gourmant en terme de temps exécution. A mon avis pour que les instructions SIMD soit efficace il faudrait réécrire tout le programme pour effectuer plusieurs triangle en même temps.
