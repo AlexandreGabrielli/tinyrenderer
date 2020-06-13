@@ -208,7 +208,7 @@ on voit ici que ce n'est pas une bonne idée d'utilisé des SIMD , le fait de ne
 
 le makefile nous force a utilisé c++98 qui est bien évidament un peu dépacer, nous allons donc update en c++14 et faire les quelques corrections dans le code nécessaire pour utilisé efficacement la version c++14 (utilisation de std::move pour la copie de string , nullptr a la place de NULL lorsqu'on veut un pointeur null,etc etc ).
 
-## amélioration 
+## amélioration  final
 
  Performance counter stats for './main ./obj/diablo3_pose/diablo3_pose.obj':
 
@@ -224,17 +224,7 @@ le makefile nous force a utilisé c++98 qui est bien évidament un peu dépacer,
     
        2.485285000 seconds user
        0.019978000 seconds sys
-l'amélioration n'est pas exceptionnel mais permet de faire une mise a jour en même temps. 
-
-### conclusion 
-
-|       | cycles | cpu-clock | faults | cache-misses | branch-misses | seconds time elapsed |
-| :---: | :----: | :-------: | :----: | :----------: | :-----------: | :------------------: |
-| diabo | -3.7%  |   -3.8%   | -1.3%  |    -17.4%    |    -27.7%     |        −4.5%         |
-| body  | -4.2%  |   -4.3%   | -0.8%  |    +26.2%    |    -19.4%     |        -4.5%         |
-| head  | -2.3%  |   -2.4%   | -0.15% |    +1.3%     |    -15.6%     |         -2%          |
-
-gain de performance en terme de cyc
+l'amélioration du changement de version de c++ n'apporte pas grand chose en terme de performance.
 
 Performance counter stats for './main ./obj/african_head/african_head.obj':
 
@@ -250,6 +240,7 @@ Performance counter stats for './main ./obj/african_head/african_head.obj':
     
        2.613710000 seconds user
        0.024052000 seconds sys
+
  Performance counter stats for './main ./obj/boggie/body.obj':
 
      4'393'381'463      cycles                    #    1.593 GHz                      (66.70%)
@@ -264,3 +255,18 @@ Performance counter stats for './main ./obj/african_head/african_head.obj':
     
        2.699265000 seconds user
        0.059894000 seconds sys
+
+
+
+# conclusion 
+
+résumer des performances (en %).
+
+|       | cycles | cpu-clock | faults |             cache-misses              | branch-misses | seconds time elapsed |
+| :---: | :----: | :-------: | :----: | :-----------------------------------: | :-----------: | :------------------: |
+| diabo | -3.7%  |   -3.8%   | -1.3%  |                -17.4%                 |    -27.7%     |        −4.5%         |
+| body  | -4.2%  |   -4.3%   | -0.8%  | <span style="color:red">+26.2%</span> |    -19.4%     |        -4.5%         |
+| head  | -2.3%  |   -2.4%   | -0.15% | <span style="color:red">+1.3%</span>  |    -15.6%     |         -2%          |
+
+on peu voir qu'on a globalement gagner sauf au niveau des cache-misses pour body et head mais le temps passé pour exécution diminue toujours et c'est ce que nous cherchions à faire
+
