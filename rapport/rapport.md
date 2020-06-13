@@ -228,6 +228,31 @@ l'amélioration n'est pas exceptionnel mais permet de faire une mise a jour en m
 
 ### conclusion 
 
+ 4'142'533'244      cycles                    #    1.591 GHz                      (66.57%)
+      2'603.20 msec cpu-clock                 #    0.991 CPUs utilized          
+         3'694      faults                    #    0.001 M/sec                  
+       288'535      cache-misses                                                  (66.78%)
+    11'232'366      branch-misses                                                 (66.64%)
+             1      migrations                #    0.000 K/sec                  
+           282      cs                        #    0.108 K/sec                  
+
+   2.627876732 seconds time elapsed
+
+   2.572036000 seconds user
+   0.031950000 seconds sys
+
+
+
+
+
+|       |   cycles   | cpu-clock | faults | cache-misses | branch-misses | migrations | seconds time elapsed | seconds user | seconds sys |
+| :---: | :--------: | :-------: | :----: | :----------: | :-----------: | :--------: | :------------------: | :----------: | :---------: |
+| diabo | -4'819'062 |   -1.15   |  + 1   |   -46'756    |   -697'047    |    + 1     |     −0.010849296     |   - 0.0009   |      0      |
+| body  |            |           |        |              |               |            |                      |              |             |
+| head  |            |           |        |              |               |            |                      |              |             |
+
+gain de performance en terme de cyc
+
 Performance counter stats for './main ./obj/african_head/african_head.obj':
 
      4'200'201'663      cycles                    #    1.593 GHz                      (66.67%)
