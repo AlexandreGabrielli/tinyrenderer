@@ -1,3 +1,0 @@
-"C:\Program Files\JetBrains\CLion 2019.3.4\bin\cmake\win\bin\cmake.exe" -E remove -f CMakeFiles\tinyrenderer.dir/objects.a
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\ar.exe cr CMakeFiles\tinyrenderer.dir/objects.a @CMakeFiles\tinyrenderer.dir\objects1.rsp
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-W\mingw64\bin\G__~1.EXE -g   -Wl,--whole-archive CMakeFiles\tinyrenderer.dir/objects.a -Wl,--no-whole-archive  -o tinyrenderer.exe -Wl,--out-implib,libtinyrenderer.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\tinyrenderer.dir\linklibs.rsp

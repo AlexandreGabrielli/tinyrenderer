@@ -203,3 +203,56 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
        2.619942000 seconds user
        0.023962000 seconds sys
 on voit ici que ce n'est pas une bonne idée d'utilisé des SIMD , le fait de ne pas faire tout les calculs est beaucoup plus rentable, cela nous enlève des caches-misses très gourmant en terme de temps exécution. A mon avis pour que les instructions SIMD soit efficace il faudrait réécrire tout le programme pour effectuer plusieurs triangle en même temps.
+
+## upgrade vers c++14
+
+le makefile nous force a utilisé c++98 qui est bien évidament un peu dépacer, nous allons donc update en c++14 et faire les quelques corrections dans le code nécessaire pour utilisé efficacement la version c++14 (utilisation de std::move pour la copie de string , nullptr a la place de NULL lorsqu'on veut un pointeur null,etc etc ).
+
+## amélioration 
+
+ Performance counter stats for './main ./obj/diablo3_pose/diablo3_pose.obj':
+
+     3'988'492'426      cycles                    #    1.593 GHz                      (66.70%)
+          2'504.46 msec cpu-clock                 #    0.998 CPUs utilized          
+             3'647      faults                    #    0.001 M/sec                  
+           238'389      cache-misses                                                  (66.57%)
+         8'125'853      branch-misses                                                 (66.72%)
+                 0      migrations                #    0.000 K/sec                  
+               229      cs                        #    0.091 K/sec                  
+    
+       2.510474604 seconds time elapsed
+    
+       2.485285000 seconds user
+       0.019978000 seconds sys
+l'amélioration n'est pas exceptionnel mais permet de faire une mise a jour en même temps. 
+
+### conclusion 
+
+Performance counter stats for './main ./obj/african_head/african_head.obj':
+
+     4'200'201'663      cycles                    #    1.593 GHz                      (66.67%)
+          2'636.99 msec cpu-clock                 #    0.998 CPUs utilized          
+             3'072      faults                    #    0.001 M/sec                  
+           221'053      cache-misses                                                  (66.71%)
+        10'103'290      branch-misses                                                 (66.62%)
+                 0      migrations                #    0.000 K/sec                  
+               275      cs                        #    0.104 K/sec                  
+    
+       2.643099615 seconds time elapsed
+    
+       2.613710000 seconds user
+       0.024052000 seconds sys
+ Performance counter stats for './main ./obj/boggie/body.obj':
+
+     4'393'381'463      cycles                    #    1.593 GHz                      (66.70%)
+          2'758.37 msec cpu-clock                 #    0.993 CPUs utilized          
+            10'517      faults                    #    0.004 M/sec                  
+           736'786      cache-misses                                                  (66.79%)
+         9'207'652      branch-misses                                                 (66.51%)
+                 3      migrations                #    0.001 K/sec                  
+               336      cs                        #    0.122 K/sec                  
+    
+       2.778828464 seconds time elapsed
+    
+       2.699265000 seconds user
+       0.059894000 seconds sys

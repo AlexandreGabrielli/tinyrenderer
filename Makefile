@@ -1,5 +1,5 @@
 SYSCONF_LINK = g++
-CPPFLAGS     = -MD -Wall -Wextra -Weffc++ -pedantic -std=c++98
+CPPFLAGS     = -MD -Wall -Wextra -Weffc++ -pedantic -std=c++14
 LDFLAGS      = -O3
 LIBS         = -lm
 
