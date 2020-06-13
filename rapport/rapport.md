@@ -119,12 +119,12 @@ lorsqu'on utilise perf ou valgrind on voit que la fonction barycentrique provoqu
 ```c++
 Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
     float u[3];
-    u[0] = (B[0] - A[0]) * (A[1] - P[1]) - (A[0] - P[0]) * (B[1] - A[1]);
-    u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
     u[2] = (C[0] - A[0]) * (B[1] - A[1]) - (B[0] - A[0]) * (C[1] - A[1]);
     if (std::abs(u[2]) <= 1e-2) {
         return Vec3f(-1, 1, 1);
     } else {
+        u[0] = (B[0] - A[0]) * (A[1] - P[1]) - (A[0] - P[0]) * (B[1] - A[1]);
+    	u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
         return Vec3f(1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
     }
 }
@@ -132,19 +132,72 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
 
 ## gain de performance
 
-regardons la différence avec 
+regardons la différence de performence apporté apporté :
 
- Performance counter stats for './main ./obj/boggie/body.obj':
+ Performance counter stats for './main ./obj/diablo3_pose/diablo3_pose.obj':
 
-     4'423'650'442      cycles                    #    1.592 GHz                      (66.54%)
-          2'779.19 msec cpu-clock                 #    0.989 CPUs utilized          
-            10'532      faults                    #    0.004 M/sec                  
-           703'178      cache-misses                                                  (66.83%)
-        10'360'565      branch-misses                                                 (66.64%)
-                 6      migrations                #    0.002 K/sec                  
-               501      cs                        #    0.180 K/sec                  
+     4'040'474'978      cycles                    #    1.592 GHz                      (66.44%)
+          2'537.62 msec cpu-clock                 #    0.993 CPUs utilized          
+             3'696      faults                    #    0.001 M/sec                  
+           245'713      cache-misses                                                  (66.91%)
+        10'227'605      branch-misses                                                 (66.65%)
+                 2      migrations                #    0.001 K/sec                  
+               276      cs                        #    0.109 K/sec                  
     
-       2.810681057 seconds time elapsed
+       2.556256736 seconds time elapsed
     
-       2.708109000 seconds user
-       0.072002000 seconds sys
+       2.518512000 seconds user
+       0.019956000 seconds sys
+on voit que la différence apporté est minime pour faire mieux nous allons essayer avec des Single Instruction on Multiple Data comme ceci sachant bien que cette fois ci on effectuera toujours le calcul baricentrique même si on voit que le vecteur normal n'est pas face à la caméra : 
+
+```c++
+Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
+
+    __m128 s1 = _mm_set_ps(0, C[0], A[0], B[0]);
+    __m128 s2 = _mm_set_ps(0, A[0], P[0], A[0]);
+    s1 = _mm_sub_ps(s1, s2); // [(B[0] - A[0]),(A[0] - P[0]),(C[0] - A[0]),0]
+
+    __m128 s3 = _mm_set_ps(0, B[1], C[1], A[1]);
+    __m128 s4 = _mm_set_ps(0, A[1], A[1], P[1]);
+    s3 = _mm_sub_ps(s3, s4);// [(A[1] - P[1]),(C[1] - A[1]),(B[1] - A[1]),0]
+
+    __m128 s5 = _mm_set_ps(0, B[0], C[0], A[0]);
+    __m128 s6 = _mm_set_ps(0, A[0], A[0], P[0]);
+    s5 = _mm_sub_ps(s5, s6);// [(A[0] - P[0]),(C[0] - A[0]),(B[0] - A[0])]
+
+    __m128 s7 = _mm_set_ps(0, C[1], A[1], B[1]);
+    __m128 s8 = _mm_set_ps(0, A[1], P[1], A[1]);
+    s7 = _mm_sub_ps(s7, s8);//[(B[1] - A[1]),(A[1] - P[1]),(C[1] - A[1]),0]
+
+    s1 = _mm_mul_ps(s1, s3);//s1*s3
+    s5 = _mm_mul_ps(s5, s7);// s5*s7
+    s1 = _mm_sub_ps(s1, s5); // s1-s5
+    
+    float u[4];
+    _mm_store_ps(u, s1);
+    if (std::abs(u[2]) <= 1e-2) {
+        return Vec3f(-1, 1, 1);
+    } else {
+        return Vec3f(1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
+    }
+
+}
+```
+
+### amélioration de performance :
+
+ Performance counter stats for './main ./obj/diablo3_pose/diablo3_pose.obj':
+
+     4'209'653'977      cycles                    #    1.593 GHz                      (66.73%)
+          2'643.30 msec cpu-clock                 #    0.996 CPUs utilized          
+             3'695      faults                    #    0.001 M/sec                  
+           268'761      cache-misses                                                  (66.50%)
+        13'845'690      branch-misses                                                 (66.77%)
+                 0      migrations                #    0.000 K/sec                  
+               267      cs                        #    0.101 K/sec                  
+    
+       2.652869555 seconds time elapsed
+    
+       2.619942000 seconds user
+       0.023962000 seconds sys
+on voit ici que ce n'est pas une bonne idée d'utilisé des SIMD , le fait de ne pas faire tout les calculs est beaucoup plus rentable, cela nous enlève des caches-misses très gourmante en terme de temps d'excecution.
