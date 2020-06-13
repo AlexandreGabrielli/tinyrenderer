@@ -114,9 +114,25 @@ nous n'effectuons les résultats intermediaire que sur l'une des trois générat
 
 ## fonction barycentrique
 
-dans ce programme on calcul très souvent le barycentre d'un triangle que ce soit pour 
+lorsqu'on utilise perf ou valgrind on voit que la fonction barycentrique provoque énormément de cache-misses/branch-misses. Cella proviens du fait que le programme est très orienté objet et donc le compilateur ne peux pas beaucoup optimiser ce code. En gardant la simplicité d'utilisation de la fonction (on gardera la même signature), nous allons effectuer les opérations "directement", remarquer que u[2] peu être la seul cordonné du vecteur calculer étant donné que si le triangle est retourné par rapport a la caméra il n'est pas afficher. 
 
+```c++
+Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
+    float u[3];
+    u[0] = (B[0] - A[0]) * (A[1] - P[1]) - (A[0] - P[0]) * (B[1] - A[1]);
+    u[1] = (A[0] - P[0]) * (C[1] - A[1]) - (C[0] - A[0]) * (A[1] - P[1]);
+    u[2] = (C[0] - A[0]) * (B[1] - A[1]) - (B[0] - A[0]) * (C[1] - A[1]);
+    if (std::abs(u[2]) <= 1e-2) {
+        return Vec3f(-1, 1, 1);
+    } else {
+        return Vec3f(1.f - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]);
+    }
+}
+```
 
+## gain de performance
+
+regardons la différence avec 
 
  Performance counter stats for './main ./obj/boggie/body.obj':
 
