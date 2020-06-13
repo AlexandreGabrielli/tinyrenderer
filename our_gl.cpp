@@ -3,13 +3,6 @@
 #include <cstdlib>
 #include "our_gl.h"
 
-#include <xmmintrin.h>
-#include <xmmintrin.h> // SSE
-#include <emmintrin.h> // SSE2
-#include <pmmintrin.h> // SSE3
-#include <tmmintrin.h> // SSSE3
-#include <smmintrin.h> // SSE4.1
-#include <nmmintrin.h> // SSE4.2
 
 Matrix ModelView;
 Matrix Viewport;

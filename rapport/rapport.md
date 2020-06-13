@@ -130,24 +130,26 @@ Vec3f barycentric(Vec2f A, Vec2f B, Vec2f C, Vec2f P) {
 }
 ```
 
-## gain de performance
+### gain de performance baricentrique 
 
 regardons la différence de performence apporté apporté :
 
  Performance counter stats for './main ./obj/diablo3_pose/diablo3_pose.obj':
 
-     4'040'474'978      cycles                    #    1.592 GHz                      (66.44%)
-          2'537.62 msec cpu-clock                 #    0.993 CPUs utilized          
-             3'696      faults                    #    0.001 M/sec                  
-           245'713      cache-misses                                                  (66.91%)
-        10'227'605      branch-misses                                                 (66.65%)
-                 2      migrations                #    0.001 K/sec                  
-               276      cs                        #    0.109 K/sec                  
+     4'017'206'660      cycles                    #    1.592 GHz                      (66.61%)
+          2'522.79 msec cpu-clock                 #    0.992 CPUs utilized          
+             3'694      faults                    #    0.001 M/sec                  
+           259'610      cache-misses                                                  (66.71%)
+         9'794'621      branch-misses                                                 (66.68%)
+                 3      migrations                #    0.001 K/sec                  
+               303      cs                        #    0.120 K/sec                  
     
-       2.556256736 seconds time elapsed
+       2.542903383 seconds time elapsed
     
-       2.518512000 seconds user
-       0.019956000 seconds sys
+       2.483628000 seconds user
+       0.040058000 seconds sys
+
+
 on voit que la différence apporté est minime pour faire mieux nous allons essayer avec des Single Instruction on Multiple Data comme ceci sachant bien que cette fois ci on effectuera toujours le calcul baricentrique même si on voit que le vecteur normal n'est pas face à la caméra : 
 
 ```c++
